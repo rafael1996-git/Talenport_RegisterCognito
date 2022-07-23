@@ -28,11 +28,7 @@ public class UserServiceImplement implements IUserService {
 		return UsuarioDao.findAll();
 	}
 
-//	@Override
-//	@Transactional
-//	public User save(User cliente) {
-//		return UsuarioDao.save(cliente);
-//	}
+
 	@Override
 	@Transactional
 	public int	  save(User user) {

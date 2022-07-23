@@ -52,7 +52,6 @@ public class User implements Serializable {
 	private String gmail;
 	@NotNull(message = "the date field cannot be empty")
     @DateTimeFormat(iso = ISO.DATE ,pattern = "yyyy/dd/MM" )
-    @NotNull
 	@Column(name = "CREATE_AT")
 	private Date fecha;
 	@Pattern(regexp = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{9,50}", message = "incorrect password")

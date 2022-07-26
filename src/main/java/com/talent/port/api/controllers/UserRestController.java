@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.talent.port.api.CognitoClean;
 import com.talent.port.api.dao.IUserDao;
 import com.talent.port.api.models.User;
 import com.talent.port.api.services.IUserService;
@@ -89,8 +90,8 @@ public class UserRestController {
 
 		try {
 			
-//			CognitoClean opj=new CognitoClean();
-//			opj.CognitoAws(user.getGmail().toString(), user.getContraseña().toString());
+			CognitoClean opj=new CognitoClean();
+			opj.CognitoAws(user.getGmail().toString(), user.getContraseña().toString());
 			UUID uuid = UUID.randomUUID();
 			String uuidAsString = uuid.toString();
 			user.setToken(uuidAsString);

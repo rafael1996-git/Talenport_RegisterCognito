@@ -1,0 +1,225 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Template For Lambda Resource
+Parameters: #No modificiar, sólo se agregan parámetros en caso de ser contenido sensible (passwords, access keys, etc)
+  Environment: #No modificar
+    Type: String
+  Name: #No modificar
+    Type: String
+  Version:
+    Type: String
+Mappings:
+  Configuration: #Sólo se modifican los valores si se ocupa un rol, vpc, subnets o security group diferentes al genérico
+    dev:
+      ReservedConcurrentExecutions: 1 #Sólo se modifica el valor si el área de Infraestructura lo permite
+      LambdaSecurityGroupIds: #Sólo se modifica el valor si se requiere un security group diferente al genérico
+        - sg-0754650f68c5229f0
+      LambdaSubnetIds: #Sólo se modifica el valor si se requieren subnets diferentes a las genéricas
+        - subnet-05bcfb0a6c28553a7
+        - subnet-059cc680142ae38af
+        - subnet-0fd211203535d95b9
+      CodeDeployRole: service-role/DevOpsCodeDeploy #No se debe modificar
+      CodeDeployType: CodeDeployDefault.LambdaAllAtOnce #No se debe modificar
+      MemorySize: 1024 #Sólo se modifica el valor si el área de Infraestructura lo permite
+      Timeout: 90 #Sólo se modifica el valor si el área de Infraestructura lo permite
+    qa:
+      ReservedConcurrentExecutions: 1 #Sólo se modifica el valor si el área de Infraestructura lo permite
+      LambdaSecurityGroupIds: #Sólo se modifica el valor si se requiere un security group diferente al genérico
+        - sg-0683ca40a42b60692
+      LambdaSubnetIds: #Sólo se modifica el valor si se requieren subnets diferentes a las genéricas
+        - subnet-0ab6a465000aa371b
+        - subnet-0fc35bb6ab1f102c9
+        - subnet-04b5d1e0b7827cbf3
+      CodeDeployRole: service-role/DevOpsCodeDeploy #No se debe modificar
+      CodeDeployType: CodeDeployDefault.LambdaAllAtOnce #No se debe modificar
+      MemorySize: 1024 #Sólo se modifica el valor si el área de Infraestructura lo permite
+      Timeout: 90 #Sólo se modifica el valor si el área de Infraestructura lo permite
+    prod:
+      ReservedConcurrentExecutions: 5
+      LambdaSecurityGroupIds: #Sólo se modifica el valor si se requiere un security group diferente al genérico
+        - sg-0b6c575c855882166
+      LambdaSubnetIds: #Sólo se modifica el valor si se requieren subnets diferentes a las genéricas
+        - subnet-0b867021563e502ee
+        - subnet-0da9b550445368a2e
+        - subnet-0231e51bddc0162a0
+      CodeDeployRole: service-role/DevOpsCodeDeploy #No se debe modificar
+      CodeDeployType: CodeDeployDefault.LambdaAllAtOnce #No se debe modificar
+      MemorySize: 1024 #Sólo se modifica el valor si el área de Infraestructura lo permite
+      Timeout: 90 #Sólo se modifica el valor si el área de Infraestructura lo permite
+  Variables: #Si la lambda no lleva variables de entorrno, no es necesario este mapping, si lleva se debe crear un key por cada variable de entorno
+    dev: #Cada key corresponde a una variable de entorno, el nombre se recomienda de la forma Upper CamelCase
+      EncryptionKey: com/trader/security/keys/encryption
+      OraCredKey: com/trader/db/oracle/usrtrader
+      BaseURLSocioMas: https://b14ctq9pl7.execute-api.us-east-1.amazonaws.com/v1
+      FirehoseNameInsertAnswers: dev.mobile.answers
+      FirehoseNameInsertMultimedia: dev.mobile.multimedia
+      SQSAnwsToS3: zeus_reports_anws_to_s3
+      SQSExtraction: zeus_extraction_ts_answered_assigns
+      SQSExtractionRedshift: zeus_extraction_ts_answered_assigns_redshift
+      SQSSumary: zeus_insert_summary
+      SQSProcessAnsweredAssign: zeus-ws-ts-process-answered-survey
+      SQSTalentsSummary: zeus_ws_ms_insert_summary
+      TopicSNS: arn:aws:sns:us-east-1:197631145735:sap-process-conversation
+    qa: #Cada key corresponde a una variable de entorno, el nombre se recomienda de la forma Upper CamelCase
+      EncryptionKey: com/trader/security/keys/encryption
+      OraCredKey: com/trader/db/oracle/usrtrader
+      BaseURLSocioMas: https://api.mobile.zeusqa.com
+      FirehoseNameInsertAnswers: qa.mobile.answers
+      FirehoseNameInsertMultimedia: qa.mobile.multimedia
+      SQSAnwsToS3: zeus_reports_anws_to_s3
+      SQSExtraction: zeus_extraction_ts_answered_assigns
+      SQSExtractionRedshift: zeus_extraction_ts_answered_assigns_redshift
+      SQSSumary: zeus_insert_summary
+      SQSProcessAnsweredAssign: zeus-ws-ts-process-answered-survey
+      SQSTalentsSummary: zeus_ws_ms_insert_summary
+      TopicSNS: arn:aws:sns:us-east-1:414657218685:sap-process-conversation
+    prod: #Cada key corresponde a una variable de entorno, el nombre se recomienda de la forma Upper CamelCase
+      EncryptionKey: com/trader/security/keys/encryption
+      OraCredKey: com/trader/db/oracle/usrtrader
+      BaseURLSocioMas: https://api.mobile.zeusgs.com.mx
+      FirehoseNameInsertAnswers: prod.mobile.backup.insertAnswers
+      FirehoseNameInsertMultimedia: prod.mobile.backup.saveMultimediaAnswer
+      SQSAnwsToS3: zeus_reports_anws_to_s3
+      SQSExtraction: zeus_extraction_ts_answered_assigns
+      SQSExtractionRedshift: zeus_extraction_ts_answered_assigns_redshift
+      SQSSumary: zeus_insert_summary
+      SQSProcessAnsweredAssign: zeus-ws-ts-process-answered-survey
+      SQSTalentsSummary: zeus_ws_ms_insert_summary
+      TopicSNS: arn:aws:sns:us-east-1:649291646652:sap-process-conversation
+  Layers:
+    dev:
+      TraderCoreSpring: "trader-core-spring:2"
+      TraderCoreSecurity: "trader-core-security:2"
+      TraderCoreDbOracle: "trader-core-db-oracle:3"
+      TraderCoreAnalytics: "trader-core-analytics:2"
+      TraderCoreCommons: "trader-core-commons:3"
+    qa:
+      TraderCoreSpring: "trader-core-spring:2"
+      TraderCoreSecurity: "trader-core-security:2"
+      TraderCoreDbOracle: "trader-core-db-oracle:2"
+      TraderCoreAnalytics: "trader-core-analytics:1"
+      TraderCoreCommons: "trader-core-commons:1"
+    prod:
+      TraderCoreSpring: "trader-core-spring:1"
+      TraderCoreSecurity: "trader-core-security:1"
+      TraderCoreDbOracle: "trader-core-db-oracle:1"
+      TraderCoreAnalytics: "trader-core-analytics:1"
+      TraderCoreCommons: "trader-core-commons:1"
+Resources:
+  LambdaRole: # No modificar nada
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Description: !Sub
+        - "Role for lambda ${Name}"
+        - { Name: !Ref Name }
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+      Path: /devops/
+      Policies:
+        - PolicyName: !Ref Name
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'lambda:InvokeFunction'
+                Resource: !Sub
+                  - 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:${Name}'
+                  - { Name: !Ref Name }
+      RoleName: !Ref Name
+      Tags:
+        - Key: "Type"
+          Value: "devops"
+  LambdaAlarm:
+    Type: AWS::CloudWatch::Alarm
+    DependsOn: LambdaFunction
+    Properties:
+      AlarmName: !Ref Name
+      AlarmDescription: Alarma de pruebas
+      MetricName: Errors
+      Namespace: AWS/Lambda
+      Statistic: Maximum
+      Period: '60'
+      EvaluationPeriods: '1'
+      Threshold: '1'
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: Name
+          Value:
+            Ref: LambdaFunction
+  LambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Ref Name #No modificar
+      CodeUri: dist #No modificar
+      Handler: com.trader.api.TraderLambdaHandler::handleRequest #Modificable
+      Runtime: java8 #Modificable
+      MemorySize: !FindInMap [ Configuration, !Ref Environment, MemorySize ] #No modificar
+      Timeout: !FindInMap [ Configuration, !Ref Environment, Timeout ] #No modificar
+      Description: !Sub
+        - "Release Version ${Version}"
+        - { Version: !Ref Version } #Modificable
+      ReservedConcurrentExecutions: !FindInMap [ Configuration, !Ref Environment, ReservedConcurrentExecutions ] #No modificar
+      Policies: #No modificar
+        - Version: 2012-10-17
+          Statement:
+            - Effect: Allow
+              Action:
+                - 'lambda:InvokeFunction'
+              Resource: !Sub
+                - 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:${Name}'
+                - { Name: !Ref Name }
+      Layers:
+        - !Sub
+          - "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:layer:${Layer}"
+          - { Layer: !FindInMap [ Layers, !Ref Environment, TraderCoreDbOracle ] }
+        - !Sub
+          - "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:layer:${Layer}"
+          - { Layer: !FindInMap [ Layers, !Ref Environment, TraderCoreSpring ] }
+        - !Sub
+          - "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:layer:${Layer}"
+          - { Layer: !FindInMap [ Layers, !Ref Environment, TraderCoreAnalytics ] }
+        - !Sub
+          - "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:layer:${Layer}"
+          - { Layer: !FindInMap [ Layers, !Ref Environment, TraderCoreSecurity ] }
+        - !Sub
+          - "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:layer:${Layer}"
+          - { Layer: !FindInMap [ Layers, !Ref Environment, TraderCoreCommons ] }
+      Environment:
+        Variables:
+          appName: !Ref Name
+          environment: !Ref Environment
+          OraCredKey: !FindInMap [ Variables, !Ref Environment, OraCredKey ]
+          BASE_URL_SOCIO_MAS: !FindInMap [ Variables, !Ref Environment, BaseURLSocioMas ]
+          FIREHOSE_NAME_INSERT_ANSWERS: !FindInMap [ Variables, !Ref Environment, FirehoseNameInsertAnswers ]
+          FIREHOSE_NAME_INSERT_MULTIMEDIA: !FindInMap [ Variables, !Ref Environment, FirehoseNameInsertMultimedia ]
+          sqs_anws_to_s3: !FindInMap [ Variables, !Ref Environment, SQSAnwsToS3 ]
+          sqs_extraction: !FindInMap [ Variables, !Ref Environment, SQSExtraction ]
+          sqs_extraction_redshift: !FindInMap [ Variables, !Ref Environment, SQSExtractionRedshift ]
+          sqs_summary: !FindInMap [ Variables, !Ref Environment, SQSSumary ]
+          sqs_process_answered_assign: !FindInMap [ Variables, !Ref Environment, SQSProcessAnsweredAssign ]
+          sqs_talents_summary: !FindInMap [ Variables, !Ref Environment, SQSTalentsSummary ]
+          TOPIC_SNS: !FindInMap [ Variables, !Ref Environment, TopicSNS ]
+          EncryptionKey: !FindInMap [ Variables, !Ref Environment, EncryptionKey ]
+
+      AutoPublishAlias: live #No modificar
+      Role: !Sub
+              - "arn:aws:iam::${AWS::AccountId}:role/devops/${LambdaRole}" #No modificar
+              - { LambdaRole: !Ref LambdaRole }
+      DeploymentPreference: #No modificar
+        Role: !Sub #No modificar
+          - "arn:aws:iam::${AWS::AccountId}:role/${CodeDeployRole}" #No modificar
+          - { CodeDeployRole: !FindInMap [ Configuration, !Ref Environment, CodeDeployRole ] }
+        Type: !FindInMap [ Configuration, !Ref Environment, CodeDeployType ] #No modificar
+      VpcConfig:
+        SecurityGroupIds: !FindInMap [ Configuration, !Ref Environment, LambdaSecurityGroupIds ] #No modificar
+        SubnetIds: !FindInMap [ Configuration, !Ref Environment, LambdaSubnetIds ] #No modificar

@@ -47,13 +47,19 @@ public class UserRestController {
 	public ResponseEntity<?> create(@Valid @RequestBody User user, BindingResult result) throws Exception {
 		Map<String, Object> response = new HashMap<>();
 		Map<String, Object> dataUser = new HashMap<>();
+		Map<String, Object> dataUserpass = new HashMap<>();
+
 		Optional<User> dato = UsuarioDao.findByEmail(user.getGmail());
+		user.setretypePassword(user.getContraseña());
+		String pass=user.getContraseña();
+	
+		log.info("paso por aqui::::::: pass: "+ user.getretypePassword()  );
 
 		if (result.hasErrors()) {
 			List<String> errors = result.getFieldErrors().stream()
 					.map(err -> err.getField() + "' " + err.getDefaultMessage()).collect(Collectors.toList());
 			for (Integer i = 0; i < errors.size(); i++) {
-				dataUser.put("Field".concat(i.toString()), errors.get(i));
+				dataUser.put("Field-".concat(i.toString()), errors.get(i));
 
 			}
 
@@ -64,18 +70,25 @@ public class UserRestController {
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
 
 		}
+		 
+		 if (dato.isPresent()  ) {
+			 
+			 dataUser.put("Field", "The user is already registered");
+				log.info("paso por aqui::::::: correo presente"  );
 
-		if (dato.isPresent()) {
-			dataUser.put("Field", "The user is already registered");
-			response.put("statusCode", 400);
-			response.put("Data", null);
-			response.put("errors", dataUser);
-			response.put("msg", "Error in filling the form");
-			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
-		}
+		        response.put("statusCode", 400);
+		        response.put("Data", null);
+		        response.put("errors", dataUser);
+		        response.put("msg", "Error in filling the form");
+		        return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
+		        
+		      }
+
+		
+		
 
 		try {
-
+			
 //			CognitoClean opj=new CognitoClean();
 //			opj.CognitoAws(user.getGmail().toString(), user.getContraseña().toString());
 			UUID uuid = UUID.randomUUID();
@@ -89,6 +102,7 @@ public class UserRestController {
 			dataUser.put("Lastname", user.getApellido());
 			dataUser.put("date", user.getFecha());
 			dataUser.put("name", user.getNombre().toString());
+		
 			UsuarioService.save(user);
 			log.info("nombre:::::::" + user.getNombre().toString());
 		} catch (DataAccessException e) {
@@ -99,7 +113,8 @@ public class UserRestController {
 			response.put("Error", e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-
+		
+		
 		response.put("statusCode", 201);
 		response.put("Data", dataUser);
 		response.put("msg", "Successful User Creation ");

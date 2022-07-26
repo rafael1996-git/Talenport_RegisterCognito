@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -27,7 +28,6 @@ import com.amazonaws.services.iotanalytics.model.Message;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.talent.port.api.utils.ValidPhoneNumber;
 
 @Entity
 @Table(name = "USERS")
@@ -48,7 +48,6 @@ public class User implements Serializable {
 	@Column(name = "LASTNAME")
 	private String apellido;
 	@Pattern(regexp = "^(\\+\\d{1,3}( )?)?(\\(\\d{3}\\)|\\d{3})[- .]?\\d{3}[- .]?\\d{4}$", message = "Please enter a valid phone number")
-//	@ValidPhoneNumber(message="Please enter a valid phone number")
 	@NotNull(message = " field cannot be empty")
 	@Column(name = "PHONE")
 	private String telefono;
@@ -63,7 +62,7 @@ public class User implements Serializable {
 	private Date fecha;
 	@Pattern(regexp = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{9,50}", message = "incorrect password")
 	@NotEmpty(message = "Please enter the Missing Required Fields")
-	@NotBlank(message = "New password is mandatory")
+	@NotBlank(message = " password is mandatory")
 	@Column(name = "PASSWORD")
 	private String contraseña;
 
@@ -73,7 +72,12 @@ public class User implements Serializable {
 	@DateTimeFormat(iso = ISO.DATE_TIME)
 	@Column(name = "UPDATED_AT")
 	private Date updated_at;
+	
 
+	@Transient
+	private String retypePassword;
+
+	
 	public Long getId() {
 		return id;
 	}
@@ -151,6 +155,15 @@ public class User implements Serializable {
 		this.updated_at = updated_at;
 	}
 
+	
+	public String getretypePassword() {
+		return retypePassword;
+	}
+	
+	public void setretypePassword(String retypePassword) {
+		this.retypePassword = retypePassword;
+	}
+	
 	
 	public User(String nombre, String apellido, String telefono, String gmail, Date fecha, String contraseña,
 			String token, Date updated_at) {

@@ -3,81 +3,63 @@ package com.talent.port.api.models;
 import java.io.Serializable;
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+//import javax.persistence.Column;
+//import javax.persistence.Entity;
+//import javax.persistence.GeneratedValue;
+//import javax.persistence.GenerationType;
+//import javax.persistence.Id;
+//import javax.persistence.Table;
+//import javax.persistence.Transient;
 import javax.validation.constraints.Email;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
-import org.hibernate.annotations.Parameter;
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.UniqueElements;
+import org.springframework.data.annotation.Transient;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 
-import com.amazonaws.services.iotanalytics.model.Message;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-@Entity
-@Table(name = "USERS")
 public class User implements Serializable {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "IDUSER")
 	private Long id;
 
-	
 	@NotEmpty(message = "Please enter the Missing Required Fields")
 	@NotNull(message = " field cannot be empty")
-	@Column(name = "NAME")
 	private String nombre;
 	@NotNull(message = " field cannot be empty")
 	@NotEmpty(message = "Please enter the Missing Required Fields")
-	@Column(name = "LASTNAME")
 	private String apellido;
 	@Pattern(regexp = "^(\\+\\d{1,3}( )?)?(\\(\\d{3}\\)|\\d{3})[- .]?\\d{3}[- .]?\\d{4}$", message = "Please enter a valid phone number")
 	@NotNull(message = " field cannot be empty")
-	@Column(name = "PHONE")
 	private String telefono;
 	@NotEmpty(message = "Please enter the Missing Required Fields")
 	@NotNull(message = "field cannot be empty")
-	@Column(name = "EMAIL" )
 	@Email(message = "Must be a Properly Formatted Email Address")
 	private String gmail;
-	@NotNull(message = "field cannot be empty")
-	@DateTimeFormat(iso = ISO.DATE, pattern = "yyyy/dd/MM")
-	@Column(name = "CREATED_AT")
-	private Date fecha;
-	@Pattern(regexp = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{9,50}", message = "incorrect password")
+	@DateTimeFormat(iso = ISO.DATE_TIME)
+	private Date created_at;
+	@Pattern(regexp = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{9,500}", message = "incorrect password")
 	@NotEmpty(message = "Please enter the Missing Required Fields")
 	@NotBlank(message = " password is mandatory")
-	@Column(name = "PASSWORD")
 	private String contraseña;
 
-	@Column(name = "TOKEN")
 	private String token;
 
-	@DateTimeFormat(iso = ISO.DATE_TIME)
-	@Column(name = "UPDATED_AT")
+	@DateTimeFormat(iso = ISO.DATE)
 	private Date updated_at;
-	
 
+	@NotNull(message = "field cannot be empty")
+	@DateTimeFormat(iso = ISO.DATE, pattern = "yyyy/dd/MM")
+	private Date fecha_nacimiento;
+
+	@NotEmpty(message = "Please enter the Missing Required Fields")
 	@Transient
 	private String retypePassword;
 
-	
 	public Long getId() {
 		return id;
 	}
@@ -118,12 +100,14 @@ public class User implements Serializable {
 		this.gmail = gmail;
 	}
 
-	public Date getFecha() {
-		return fecha;
+	@JsonIgnore
+	@JsonProperty(value = "created_at")
+	public Date getCreated_at() {
+		return created_at;
 	}
 
-	public void setFecha(Date fecha) {
-		this.fecha = fecha;
+	public void setCreated_at(Date date) {
+		this.created_at = date;
 	}
 
 	@JsonIgnore
@@ -145,6 +129,7 @@ public class User implements Serializable {
 	public void setToken(String token) {
 		this.token = token;
 	}
+
 	@JsonIgnore
 	@JsonProperty(value = "updated_at")
 	public Date getUpdated_at() {
@@ -155,27 +140,34 @@ public class User implements Serializable {
 		this.updated_at = updated_at;
 	}
 
-	
 	public String getretypePassword() {
 		return retypePassword;
 	}
-	
+
 	public void setretypePassword(String retypePassword) {
 		this.retypePassword = retypePassword;
 	}
-	
-	
-	public User(String nombre, String apellido, String telefono, String gmail, Date fecha, String contraseña,
-			String token, Date updated_at) {
+
+	public Date getFecha_nacimiento() {
+		return fecha_nacimiento;
+	}
+
+	public void setFecha_nacimiento(Date fecha_nacimiento) {
+		this.fecha_nacimiento = fecha_nacimiento;
+	}
+
+	public User(String nombre, String apellido, String telefono, String gmail, Date created_at, String contraseña,
+			String token, Date updated_at, Date fecha_nacimiento) {
 
 		this.nombre = nombre;
 		this.apellido = apellido;
 		this.telefono = telefono;
 		this.gmail = gmail;
-		this.fecha = fecha;
+		this.created_at = created_at;
 		this.contraseña = contraseña;
 		this.token = token;
 		this.updated_at = updated_at;
+		this.fecha_nacimiento = fecha_nacimiento;
 	}
 
 	public User() {

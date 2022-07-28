@@ -15,17 +15,13 @@
 	<name>talentport-Register</name>
 	<description>Proyecto Rest para resgistrar usuarios TalentPort</description>
 	<properties>
-		<java.version>1.8</java.version>
+		<java.version>11</java.version>
 	</properties>
 	<dependencies>
-	<dependency>
+		<dependency>
 			<groupId>com.twilio.sdk</groupId>
 			<artifactId>twilio</artifactId>
 			<version>7.48.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -58,8 +54,8 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		
-		
+
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
@@ -74,43 +70,41 @@
 			<artifactId>aws-java-sdk-cognitoidp</artifactId>
 			<version>1.12.264</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk -->
+
 		<dependency>
-		    <groupId>com.amazonaws</groupId>
-		    <artifactId>aws-java-sdk</artifactId>
-		    <version>1.12.254</version>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
-		
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
-<!-- <build> -->
-<!--     <plugins> -->
-<!--         <plugin> -->
-<!--             <groupId>org.apache.maven.plugins</groupId> -->
-<!--             <artifactId>maven-shade-plugin</artifactId> -->
-<!--             <version>3.2.4</version> -->
-<!--             <configuration> -->
-<!--                 <createDependencyReducedPom>false</createDependencyReducedPom> -->
-<!--             </configuration> -->
-<!--             <executions> -->
-<!--                 <execution> -->
-<!--                     <phase>package</phase> -->
-<!--                     <goals> -->
-<!--                         <goal>shade</goal> -->
-<!--                     </goals> -->
-<!--                     <configuration> -->
-<!--                         <artifactSet> -->
-<!--                             <excludes> -->
-<!--                                 <exclude>org.apache.tomcat.embed:*</exclude> -->
-<!--                             </excludes> -->
-<!--                         </artifactSet> -->
-<!--                     </configuration> -->
-<!--                 </execution> -->
-<!--             </executions> -->
-<!--         </plugin> -->
-<!--     </plugins> -->
-<!--    </build> -->
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<configuration>
+					<createDependencyReducedPom>false</createDependencyReducedPom>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<artifactSet>
+								<excludes>
+									<exclude>org.apache.tomcat.embed:*</exclude>
+								</excludes>
+							</artifactSet>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>

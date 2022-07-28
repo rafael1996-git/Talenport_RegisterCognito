@@ -1,8 +1,5 @@
 package com.talent.port.api;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.cognitoidp.AWSCognitoIdentityProvider;
@@ -19,10 +16,8 @@ public class CognitoClean {
 	private static final String ACCESS_KEY = "AKIAXHK4TJMWXPLW5SWU";
 	private static final String SECRET_KEY = "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";
 	private static final String userPoolId = "us-east-1_f5HmZlNXE";
-	private static final Logger log = LoggerFactory.getLogger(CognitoClean.class);
 
 	public void CognitoAws (String email, String password) throws Exception{
-		//AWS credentials
 		
 
 		BasicAWSCredentials awsCreds = new BasicAWSCredentials(ACCESS_KEY, SECRET_KEY);
@@ -31,7 +26,6 @@ public class CognitoClean {
 		        .standard().withCredentials(new AWSStaticCredentialsProvider(awsCreds))
 		        .withRegion("us-east-1").build();
 
-//		String username = "juan";
 		
 		try {
 		    AttributeType emailAttr = new AttributeType().withName("email").withValue(email);

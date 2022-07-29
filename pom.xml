@@ -23,6 +23,7 @@
 			<artifactId>twilio</artifactId>
 			<version>7.48.0</version>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -80,6 +81,12 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+		    <groupId>com.amazonaws</groupId>
+		    <artifactId>aws-java-sdk-secretsmanager</artifactId>
+		    <version>1.12.270</version>
+		</dependency>
+
 	</dependencies>
 	<build>
 		<plugins>

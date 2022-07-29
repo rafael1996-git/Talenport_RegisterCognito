@@ -1,6 +1,8 @@
 package com.talent.port.api.services;
 
 
+import javax.sql.DataSource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -13,6 +15,14 @@ public class UserServiceImplement implements IUserService {
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
+	
+
+
+	@Autowired(required = true)
+	public void init(DataSource dataSource) {
+	    jdbcTemplate = new JdbcTemplate(dataSource);
+	}
+
 
 	@Override
 	@Transactional

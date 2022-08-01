@@ -4,7 +4,8 @@ import java.util.Base64;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import com.amazonaws.services.cognitoidp.model.InvalidParameterException;
 import com.amazonaws.services.cognitoidp.model.ResourceNotFoundException;
@@ -15,24 +16,21 @@ import com.amazonaws.services.secretsmanager.model.GetSecretValueRequest;
 import com.amazonaws.services.secretsmanager.model.GetSecretValueResult;
 import com.amazonaws.services.secretsmanager.model.InternalServiceErrorException;
 import com.amazonaws.services.secretsmanager.model.InvalidRequestException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.talent.port.api.services.IUserService;
 import com.talent.port.api.utils.SpringJdbcTemplateConfig;
 
 public class SecretManager {
+	
+
 	// Use this code snippet in your app.
 	// If you need more information about configurations or implementing the sample code, visit the AWS docs:
 	// https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/java-dg-samples.html#prerequisites
     private static final Logger log = LoggerFactory.getLogger(SecretManager.class);
-    public static String URL;
-    public static String USERNAME;
-    public static String PASSWORD;
-
-
-
-	public static void getSecret() throws Exception {
+   
+    
+	public static   String getSecret(String conecta) throws Exception {
 
 	    String secretName = "com/talentport/backend";
 	    String region = "us-east-1";
@@ -48,7 +46,7 @@ public class SecretManager {
 	    
 	    String secret, decodedBinarySecret;
 	    GetSecretValueRequest getSecretValueRequest = new GetSecretValueRequest()
-	                    .withSecretId(secretName);
+	                    .withSecretId(conecta);
 	    GetSecretValueResult getSecretValueResult = null;
 
 	    try {
@@ -78,26 +76,24 @@ public class SecretManager {
 	    // Decrypts secret using the associated KMS key.
 	    // Depending on whether the secret is a string or binary, one of these fields will be populated.
 	    if (getSecretValueResult.getSecretString() != null) {
-	        secret = getSecretValueResult.getSecretString();
-	        
-            ObjectMapper objectMapper  =  new  ObjectMapper();
-            String secretValue= client.getSecretValue(getSecretValueRequest).getSecretString();
-            JsonNode secretsJson  =  objectMapper.readTree(secretValue);
-             String  host  =  secretsJson.get("host").textValue();
-            String  port  =  secretsJson.get("port").textValue();
-            String  dbname  =  secretsJson.get("dbname").textValue();
-            String  username  =  secretsJson.get("username").textValue();
-            String  password  =  secretsJson.get("password").textValue();
-            URL=host;
-            USERNAME=username;
-            PASSWORD=password;
-            log.info("dataos de conexion : "+URL +" : "+USERNAME+" :"+PASSWORD+" :" );
-
-            SpringJdbcTemplateConfig.getConexion(host, username, password);
+//	        secret = getSecretValueResult.getSecretString();
+//	        
+//            ObjectMapper objectMapper  =  new  ObjectMapper();
+//            String secretValue= client.getSecretValue(getSecretValueRequest).getSecretString();
+//            JsonNode secretsJson  =  objectMapper.readTree(secretValue);
+//             String  host  =  secretsJson.get("host").textValue();
+//            String  port  =  secretsJson.get("port").textValue();
+//            String  dbname  =  secretsJson.get("dbname").textValue();
+//            String  username  =  secretsJson.get("username").textValue();
+//            String  password  =  secretsJson.get("password").textValue();
+//            SpringJdbcTemplateConfig opj=new SpringJdbcTemplateConfig();
+            return getSecretValueResult.getSecretString();
+//            opj.getConexion(dbname, username, password);
 	    }
 	    else {
 	        decodedBinarySecret = new String(Base64.getDecoder().decode(getSecretValueResult.getSecretBinary()).array());
 	    }
+		return decodedBinarySecret;
 
 	    // Your code goes here.
 	}

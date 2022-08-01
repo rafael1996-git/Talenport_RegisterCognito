@@ -20,6 +20,7 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -53,7 +54,8 @@ public class User implements Serializable {
 	private Date updated_at;
 
 	@NotNull(message = "field cannot be empty")
-	@DateTimeFormat(iso = ISO.DATE, pattern = "yyyy/dd/MM")
+//	@DateTimeFormat(iso = ISO.DATE, pattern = "yyyy/dd/MM")
+	@JsonFormat(pattern = "yyyy/dd/MM")
 	private Date fecha_nacimiento;
 
 	@NotEmpty(message = "Please enter the Missing Required Fields")

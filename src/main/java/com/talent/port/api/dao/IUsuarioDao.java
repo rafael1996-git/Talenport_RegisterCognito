@@ -14,4 +14,5 @@ public interface IUsuarioDao extends CrudRepository<User, Long> {
 
 	@Query("SELECT *  FROM USERS  where EMAIL =  :email")
 	List<User> findByemail(@Param("email") String email);
+	
 }
